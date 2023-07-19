@@ -68,7 +68,7 @@ def update_progress(*args):  # args is needed as this is a callback from a trace
     text_len = len(entry_str.get())
     bar['value'] = (text_len / 20) * 100
 
-root = ttkb.Window(themename='cyborg')
+root = ttkb.Window(themename='solar')
 root.title('Morse Code Fun!')
 root.geometry('600x600')
 
