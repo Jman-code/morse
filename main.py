@@ -1,8 +1,11 @@
+from pathlib import Path
+from itertools import cycle
 import tkinter as tk
 from tkinter import *
 import tkinter.ttk as ttk
 import ttkbootstrap as ttkb
 from ttkbootstrap.constants import *
+from PIL import Image, ImageTk, ImageSequence
 
 
 morse_code = {
@@ -18,6 +21,30 @@ morse_code = {
     ";": "-.-.-.", "=": "-...-", "+": ".-.-.", "-": "-....-", "_": "..--.-",
     "\"": ".-..-.", "$": "...-..-", "@": ".--.-.", " ": " "
 }
+
+class AnimatedGif(ttkb.Frame):
+    def __init__(self, master):
+        super().__init__(master, width=400, height=300)
+
+        # open the GIF and create a cycle iterator
+        file_path = Path(__file__).parent / "rotating_gif.gif"
+        with Image.open(file_path) as im:
+            # create a sequence
+            sequence = ImageSequence.Iterator(im)
+            images = [ImageTk.PhotoImage(s) for s in sequence]
+            self.image_cycle = cycle(images)
+
+            # length of each frame
+            self.framerate = im.info["duration"]
+
+        self.img_container = ttk.Label(self, image=next(self.image_cycle))
+        self.img_container.pack(fill="both", expand="yes")
+        self.after(self.framerate, self.next_frame)
+
+    def next_frame(self):
+        """Update the image for each frame"""
+        self.img_container.configure(image=next(self.image_cycle))
+        self.after(self.framerate, self.next_frame)
 
 def translator(text):
     text = text.upper()
@@ -43,9 +70,10 @@ def update_progress(*args):  # args is needed as this is a callback from a trace
 
 root = ttkb.Window(themename='cyborg')
 root.title('Morse Code Fun!')
-root.geometry('500x350')
+root.geometry('600x600')
 
-
+gif = AnimatedGif(root)
+gif.pack(fill=BOTH, expand=YES, padx=100)
 
 
 greeting = ttkb.Label(root, text='Enter your Text Below',
